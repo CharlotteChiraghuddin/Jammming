@@ -1,57 +1,45 @@
+import React, { useState, useEffect } from 'react';
 import "./style.css";
-import React,{ useState } from 'react';
+import NewTodoForm from './newTodoForm';
+import TodoList from './TodoList';
+
 function App() {
-  const [newItem, setNewItem]= useState("");
-  const [todos, setTodos]= useState([]);
+  const [todos, setTodos] = useState(()=>{
+    const localValue = localStorage.getItem("ITEMS")
+    if(localValue == null)return []
 
-  function handleSubmit(e){
-    e.preventDefault()
+    return JSON.parse(localValue);
+  });
+
+  useEffect(()=>{
+    localStorage.setItem("ITEMS",JSON.stringify(todos))
+  },[todos])
+
+  function toggleTodo(id, completed) {
     setTodos((currentTodos) => {
-      return [
-        ...currentTodos, {id: crypto.randomUUID(), title:newItem, completed: false},
-      ]
-    })
-  }
-  function toggleTodo(id, completed){
-    setTodos(currentTodos=>{
-      return currentTodos.map(todo=>{
-        if(todo.id === id){
-          return {...todo, completed}
+      return currentTodos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, completed };
         }
-      })
-    })
+        return todo; // Ensure other todos are returned unchanged
+      });
+    });
   }
-  function deleteTodo(id){
-    setTodos(currentTodos=>{
-      return currentTodos.filter(todo => todo.id !== id)
 
-      })
-    }
+  function deleteTodo(id) {
+    setTodos((currentTodos) => {
+      return currentTodos.filter((todo) => todo.id !== id);
+    });
+  }
 
   return (
-  <>
-  <form className="new-item-form" onSubmit={handleSubmit}>
-    <div className="form-row">
-      <label>New Item</label>
-      <input type="text" id="item" value={newItem} onChange={e=>setNewItem(e.target.value)}/>
-    </div>
-    <button className="btn">Add</button>
-  </form>
-  <h1 className="header">Todo List</h1>
-  <ul className="list">
-    {todos.map(todo=> {
-      return(
-        <li key={todo.id}>
-        <label>
-          <input type="checkbox" checked={todo.completed} onChange={e=> toggleTodo(todo.id, e.target.checked)}/>
-        </label>
-        <button onClick={() => deleteTodo(todo.id)} className="btn btn-danger">Delete</button>
-      </li>
-      )
-    })}
-    </ul>
-  </>
-  )
-};
+    <>
+      <NewTodoForm setTodos={setTodos} />
+      <h1 className="header">Todo List</h1>
+      <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo}/>
+      
+    </>
+  );
+}
 
 export default App;
