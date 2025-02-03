@@ -1,44 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import "./style.css";
-import NewTodoForm from './newTodoForm';
-import TodoList from './TodoList';
+import logo from './logo.svg';
+import './App.css';
+import { useEffect, useState } from 'react';
+import { Button, Container, Form, FormControl, InputGroup } from 'react-bootstrap';
 
-function App() {
-  const [todos, setTodos] = useState(()=>{
-    const localValue = localStorage.getItem("ITEMS")
-    if(localValue == null)return []
+const CLIENT_ID = "";
+const CLIENT_SECRET = "";
 
-    return JSON.parse(localValue);
-  });
 
-  useEffect(()=>{
-    localStorage.setItem("ITEMS",JSON.stringify(todos))
-  },[todos])
+function App() {  
+  const [accessToken, setaccessToken] = useState("");
+  const [searchInput, setSearchInput] = useState("");
 
-  function toggleTodo(id, completed) {
-    setTodos((currentTodos) => {
-      return currentTodos.map((todo) => {
-        if (todo.id === id) {
-          return { ...todo, completed };
-        }
-        return todo; // Ensure other todos are returned unchanged
-      });
-    });
+  useEffect( () => {
+  var authParameters = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'grant_type=client_credentials&client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET
   }
 
-  function deleteTodo(id) {
-    setTodos((currentTodos) => {
-      return currentTodos.filter((todo) => todo.id !== id);
-    });
+  fetch('https://accounts.spotify.com/api/token', authParameters)
+  .then(results => results.json())
+  .then(data => setaccessToken(data.access_token))
+  }, [])
+
+
+
+async function search() {
+  console.log("Access Token"+ accessToken);
+
+  //First Get the Artist ID
+
+  var searchParameters = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization':'Bearer ' + accessToken
+    }
+
   }
+  var artistId = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist', searchParameters)
+  .then(response => response.json())
+  .then(data => {return data.artist.items[0].id})
+
+  console.log("Artist Id = " + artistId);
+
+  //Next we can get the Albumns of that artist
+  var albums = await fetch('https://api.spotify.com/v1/artists/'+ artistId +'/albums' + 'include_groups=album&limit=20', searchParameters)
+  .then(response => response.json())
+
+}
+
+
 
   return (
-    <>
-      <NewTodoForm setTodos={setTodos} />
-      <h1 className="header">Todo List</h1>
-      <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo}/>
-      
-    </>
+    <div className="App">
+     <Container>
+<InputGroup className="mb-3" size='lg'>
+  <FormControl
+  placeholder="Search For Artist"
+  type='input'
+  onChange={event => setSearchInput(event.target.value)}></FormControl>
+  <Button onClick={() => search()}>
+    Search
+  </Button>
+</InputGroup>
+     </Container>
+    </div>
   );
 }
 

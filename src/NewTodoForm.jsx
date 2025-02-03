@@ -18,7 +18,7 @@ function NewTodoForm({ setTodos }) {
   return (
     <form className="new-item-form" onSubmit={handleSubmit}>
       <div className="form-row">
-        <label>New Item</label>
+        <label htmlFor='item'>New Item</label>
         <input
           type="text"
           id="item"
