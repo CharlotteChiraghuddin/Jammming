@@ -12,7 +12,15 @@ function App() {
   const [albums, setAlbums]= useState([]);
   const [tracks, setTracks]= useState({});
   const [playlist, setPlaylist] = useState([]);
-
+  const [spotifyID, setSpotifyID] = useState([]);
+  function changeBackground(e){
+    e.target.style.backgroundColor = 'grey';
+    
+  }
+  function mouseLeaveHandler(e){
+    e.target.style.backgroundColor = '#212529';
+  }
+  
   useEffect(() => {
     //API Acess Token
     var authParameters = {
@@ -56,6 +64,7 @@ function App() {
     return trackIds;
   });
   console.log('This is the spotify ID' + spotifyID);
+  setSpotifyID(spotifyID);
   
   // Function to fetch track details and update state 
   async function fetchTrackDetails(id) { 
@@ -71,11 +80,17 @@ function App() {
     console.log(tracks);
   },[tracks]); //logs tracks whenever it updates
   
+  function AddToPlaylist(item = { spotifyID:''}){
+    if (!item || !item.spotifyID) {
+      console.error("Item or spotifyID is undefined");
+      return(console.log(spotifyID))
+  }
+}
   return (
     <div className="App">
       <Container>
         <InputGroup className="mb-3" size="lg">
-        <FormControl 
+        <FormControl style = {{marginTop:'2rem',border:'2px solid black'}}
         placeholder="Search For Artist"
         type="input"
         onKeyDown={event => {
@@ -84,20 +99,20 @@ function App() {
           }
         }}
         onChange={event => setSearchInput(event.target.value)}/>
-        <Button onClick={search}>Search</Button>
+        <Button style={{padding:'1rem', marginTop:'2rem',border:'2px solid black'}} onClick={search}>Search</Button>
         </InputGroup>
       </Container>
       <Container fluid>
         <Row className="g-3">
           {Object.keys(tracks).length > 0 ? 
           ( Object.values(tracks).map((track, i) => (
-            <Col className="mb-3" key={i} xs={12} sm={6} md={3} style={{display:'flex', justifyContent:'center'}}>
+            <Col  className="mb-3" key={i} xs={12} sm={6} md={3} style={{display:'flex', justifyContent:'center'}}>
               <Card className="custom-card-width"  key={i} bg={'dark'} > 
                 <Card.Img src={track.album.images[0].url} alt="Album Cover" /> 
                 <Card.Body> 
                   <Card.Title style={{color:'white', font:'manrope'}}>{track.name}</Card.Title> 
                 </Card.Body> 
-                <Button variant='light' style={{fontWeight:'bold', fontSize:'2rem' ,width:'30%',backgroundColor:'#104C7B',color:'white'}}onClick={()=>console.log(track)}>+</Button>
+                <Button className="addPlaylistButton" title="Add to Playlist" variant='light'onMouseOver={changeBackground} onMouseLeave={mouseLeaveHandler} onClick={AddToPlaylist}>+</Button>
               </Card> 
             </Col> )) ) : 
           ( <p></p> )}

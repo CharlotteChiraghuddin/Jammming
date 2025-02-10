@@ -1,6 +1,7 @@
 .App {
   text-align: center;
   background-color: black;
+  height:100%;
 }
 
 
@@ -8,6 +9,17 @@
   height: 40vmin;
   pointer-events: none;
 }
+
+
+button.addPlaylistButton{
+  padding:0;
+  padding-bottom:0.5rem;
+  background-color:#212529;
+  color:white;
+  font-size:3rem;
+  border: none;
+}
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
