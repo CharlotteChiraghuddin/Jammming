@@ -1,10 +1,15 @@
 {
+  "resolutions": {
+  "//": "See https://github.com/facebook/create-react-app/issues/11773",
+  "react-error-overlay": "6.0.9"
+},
   "name": "jammming",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",
+    "express": "^4.21.2",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.7",
     "react-dom": "^19.0.0",
